@@ -1,13 +1,14 @@
-CREATE DATABASE IF NOT EXISTS chintamani;
+CREATE DATABASE IF NOT EXISTS chintamani; //In community edition, we can create only one database.
 
-CREATE (n:Naren {name: "Narendranath Gogineni", age: 25, aboutMe: "I exist as an idea"});
+CREATE (n:Naren {name: "Narendranath Gogineni", age: 25, aboutMe: "I exist as an idea", id: randomUUID()});
 
 MATCH (n:Naren)
-CREATE (b:Blogs)
+CREATE (b:Blogs {id: randomUUID()})
 CREATE (n)-[:DATA_SOURCE]->(b);
 
 WITH date("2024-05-20") AS blogDate
 CREATE (a:Blog {
+    id: randomUUID(),
     title: "I exist as an idea",
     content: "I exist as an idea",
     author: "Narendranath Gogineni",
