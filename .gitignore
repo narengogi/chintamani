@@ -37,3 +37,4 @@ build/
 
 # Production configuration
 src/main/resources/application-prod.properties
+src/main/java/in/naths/chintamani/config/CorsConfig.java
