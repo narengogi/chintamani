@@ -21,7 +21,7 @@ public class Neo4jQueryService {
     }
 
     public String getNodeNarenAsJson() {
-        Map<String, Object> result = neo4jClient.query("MATCH (n:Naren) RETURN n{.*, id: n.id, parentId: null} AS node")
+        Map<String, Object> result = neo4jClient.query("MATCH (n:NAREN) RETURN n{.*, id: n.id, parentId: null, labels: labels(n)} AS node")
             .fetch()
             .one()
             .orElse(null);
@@ -36,7 +36,7 @@ public class Neo4jQueryService {
     public String getChildren(String id) {
         Collection<Map<String, Object>> result = neo4jClient.query(
             "MATCH (parent {id: $id})-[r]->(child) " +
-            "RETURN child{.*, id: child.id, parentId: $id} AS node"
+            "RETURN child{.*, id: child.id, parentId: $id, labels: labels(child)} AS node"
         ).bind(id).to("id").fetch().all();
         try {
             return objectMapper.writeValueAsString(result);
