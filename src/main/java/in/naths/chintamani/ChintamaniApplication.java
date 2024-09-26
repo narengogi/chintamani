@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"in.naths.chintamani", "in.naths.chintamani.config"})
+@ComponentScan
 public class ChintamaniApplication {
 
 	public static void main(String[] args) {
