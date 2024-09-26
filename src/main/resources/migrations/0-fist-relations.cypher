@@ -1,10 +1,12 @@
 CREATE DATABASE IF NOT EXISTS chintamani; //In community edition, we can create only one database.
 
+CREATE CONSTRAIN FOR (n) REQUIRE n.title IS UNIQUE;
+
 CREATE (n:NAREN {title: "Narendranath Gogineni", age: 25, aboutMe: "I exist as an idea", id: randomUUID()});
 
 MATCH (n:NAREN)
 CREATE (blogs:BLOGS {id: randomUUID(), title: "Blogs"})
-CREATE (github:GITHUB {id: randomUUID(), title: "Github"})
+CREATE (github:GITHUB {id: randomUUID(), title: "Github", username: "narengogi"})
 CREATE (socials:SOCIALS {id: randomUUID(), title: "Socials"})
 CREATE (browsers:BROWSERS {id: randomUUID(), title: "Browsers"})
 CREATE (music:MUSIC {id: randomUUID(), title: "Music"})
