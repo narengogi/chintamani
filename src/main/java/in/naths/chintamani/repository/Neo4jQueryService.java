@@ -2,6 +2,8 @@ package in.naths.chintamani.repository;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.core.Neo4jClient;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 @Service
@@ -72,9 +75,11 @@ public class Neo4jQueryService {
             }
             // Parse the childObject JSON string into a JsonNode
             JsonNode jsonNode = objectMapper.readTree(childObject);
-            
+            ObjectNode objectNode = objectMapper.createObjectNode();
+            objectNode.put("id", UUID.randomUUID().toString());
+            objectNode.put("updatedAt", LocalDateTime.now().toString());
             // Convert the JsonNode to a string with unquoted keys
-            String customChildObjectString = jsonNode.toString().replaceAll("\"(\\w+)\":", "$1:");
+            String customChildObjectString = objectNode.toString().replaceAll("\"(\\w+)\":", "$1:");
             
             String query = """
             MATCH (parent {id: "PARENT_ID_PLACEHOLDER"})

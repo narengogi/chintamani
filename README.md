@@ -1,0 +1,4 @@
+RESERVED KEYWORDS WHILE INSERTING NODES:
+
+- `updatedAt`
+- `id`
