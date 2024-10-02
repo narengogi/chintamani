@@ -1,9 +1,9 @@
 package in.naths.chintamani.repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.neo4j.core.Neo4jClient;
@@ -75,22 +75,18 @@ public class Neo4jQueryService {
             }
             // Parse the childObject JSON string into a JsonNode
             JsonNode jsonNode = objectMapper.readTree(childObject);
-            ObjectNode objectNode = objectMapper.createObjectNode();
+            ObjectNode objectNode = (ObjectNode) jsonNode;
             objectNode.put("id", UUID.randomUUID().toString());
             objectNode.put("updatedAt", LocalDateTime.now().toString());
             // Convert the JsonNode to a string with unquoted keys
             String customChildObjectString = objectNode.toString().replaceAll("\"(\\w+)\":", "$1:");
-            
-            String query = """
-            MATCH (parent {id: "PARENT_ID_PLACEHOLDER"})
-            MERGE (child: CHILD_LABEL_PLACEHOLDER {title: "TITLE_PLACEHOLDER"})
-            ON CREATE SET child = CHILD_OBJECT_PLACEHOLDER
-            ON MATCH SET child += CHILD_OBJECT_PLACEHOLDER
-            MERGE (parent)-[:RELATIONSHIP_PLACEHOLDER]->(child)
-            """.replaceAll("PARENT_ID_PLACEHOLDER",parentId).replaceAll("CHILD_LABEL_PLACEHOLDER",childLabel)
-            .replaceAll("CHILD_OBJECT_PLACEHOLDER",customChildObjectString).replaceAll("RELATIONSHIP_PLACEHOLDER",relationship)
-            .replaceAll("TITLE_PLACEHOLDER",jsonNode.get("title").asText());
 
+            String query = "MATCH (parent {id: \"" + parentId + "\"}) " +
+            "MERGE (child: " + childLabel + " {title: \"" + jsonNode.get("title").asText() + "\"}) " +
+            "ON CREATE SET child = " + customChildObjectString +
+            "ON MATCH SET child += " + customChildObjectString +
+            "MERGE (parent)-[:" + relationship + "]->(child)";
+            
             neo4jClient.query(query)
             .fetch().one();
             return true;
