@@ -1,7 +1,5 @@
 CREATE DATABASE IF NOT EXISTS chintamani; //In community edition, we can create only one database.
 
-CREATE CONSTRAIN FOR (n) REQUIRE n.title IS UNIQUE;
-
 CREATE (n:NAREN {title: "Narendranath Gogineni", age: 25, aboutMe: "I exist as an idea", id: randomUUID()});
 
 MATCH (n:NAREN)

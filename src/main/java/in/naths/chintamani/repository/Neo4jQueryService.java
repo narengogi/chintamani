@@ -49,18 +49,26 @@ public class Neo4jQueryService {
         }
     }
 
-    public Boolean createChild(String childLabel,String childObject, String parentPath, String relationship) {
+    public Boolean createChild(String childLabel, String childObject, String parentPath, String relationship, String parentLabel) {
         try {
             String parentId= "";
             String[] labels = parentPath.split("\\.");
+            String parentLabelSelector = parentLabel == null ? "" : "{title: '"+parentLabel+"'}"; 
             if (labels.length == 1) {
                 Map<String, Object> map = neo4jClient
-                .query("MATCH (n:"+labels[0]+") return n.id")
+                .query("MATCH (n:"+labels[0]+parentLabelSelector+") return n.id")
                 .fetch().one().orElse(null);
                 parentId = map.get("n.id").toString();
             } else {
-                // StringBuilder query = new StringBuilder("MATCH (parent:");
-                // handle the case for more than 1 label
+                StringBuilder query = new StringBuilder("MATCH ");
+                for (int i = 0; i< labels.length - 1;i++) {
+                   query.append("("+labels[i]+")-[]-");
+                }
+                query.append(">(n:"+labels[labels.length - 1]+parentLabelSelector+") return n.id");
+                Map<String, Object> map = neo4jClient
+                .query(query.toString())
+                .fetch().one().orElse(null);
+                parentId = map.get("n.id").toString();
             }
             // Parse the childObject JSON string into a JsonNode
             JsonNode jsonNode = objectMapper.readTree(childObject);
@@ -68,10 +76,17 @@ public class Neo4jQueryService {
             // Convert the JsonNode to a string with unquoted keys
             String customChildObjectString = jsonNode.toString().replaceAll("\"(\\w+)\":", "$1:");
             
-            neo4jClient.query("""
-            MATCH (parent {id: "$parentId"}) 
-            CREATE (parent)-[:$relationship]->(child: $childLabel $childObject)
-            """.replace("$parentId",parentId).replace("$childLabel",childLabel).replace("$childObject",customChildObjectString).replace("$relationship",relationship))
+            String query = """
+            MATCH (parent {id: "PARENT_ID_PLACEHOLDER"})
+            MERGE (child: CHILD_LABEL_PLACEHOLDER {title: "TITLE_PLACEHOLDER"})
+            ON CREATE SET child = CHILD_OBJECT_PLACEHOLDER
+            ON MATCH SET child += CHILD_OBJECT_PLACEHOLDER
+            MERGE (parent)-[:RELATIONSHIP_PLACEHOLDER]->(child)
+            """.replaceAll("PARENT_ID_PLACEHOLDER",parentId).replaceAll("CHILD_LABEL_PLACEHOLDER",childLabel)
+            .replaceAll("CHILD_OBJECT_PLACEHOLDER",customChildObjectString).replaceAll("RELATIONSHIP_PLACEHOLDER",relationship)
+            .replaceAll("TITLE_PLACEHOLDER",jsonNode.get("title").asText());
+
+            neo4jClient.query(query)
             .fetch().one();
             return true;
         } catch (Exception e) {
