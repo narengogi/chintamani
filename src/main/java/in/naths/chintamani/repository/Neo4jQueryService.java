@@ -49,14 +49,14 @@ public class Neo4jQueryService {
         }
     }
 
-    public Boolean createChild(String childLabel, String childObject, String parentPath, String relationship, String parentLabel) {
+    public Boolean createChild(String childLabel, String childObject, String parentPath, String relationship, String parentTitle) {
         try {
             String parentId= "";
             String[] labels = parentPath.split("\\.");
-            String parentLabelSelector = parentLabel == null ? "" : "{title: '"+parentLabel+"'}"; 
+            String parentLabelSelector = parentTitle == null ? "" : "{title: \""+parentTitle+"\"}"; 
             if (labels.length == 1) {
                 Map<String, Object> map = neo4jClient
-                .query("MATCH (n:"+labels[0]+parentLabelSelector+") return n.id")
+                .query("MATCH (n:"+labels[0]+parentLabelSelector+") return n.id LIMIT 1")
                 .fetch().one().orElse(null);
                 parentId = map.get("n.id").toString();
             } else {
@@ -64,7 +64,7 @@ public class Neo4jQueryService {
                 for (int i = 0; i< labels.length - 1;i++) {
                    query.append("("+labels[i]+")-[]-");
                 }
-                query.append(">(n:"+labels[labels.length - 1]+parentLabelSelector+") return n.id");
+                query.append(">(n:"+labels[labels.length - 1]+parentLabelSelector+") return n.id LIMIT 1");
                 Map<String, Object> map = neo4jClient
                 .query(query.toString())
                 .fetch().one().orElse(null);

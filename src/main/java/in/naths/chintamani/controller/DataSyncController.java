@@ -28,8 +28,8 @@ public class DataSyncController {
         String label = body.get("label");
         String parentPath = body.get("parentPath");
         String relationship = body.get("relationship");
-        String parentLabel = body.get("parentLabel");
-        Boolean result = neo4jQueryService.createChild(label, data, parentPath, relationship, parentLabel);
+        String parentTitle = body.get("parentTitle");
+        Boolean result = neo4jQueryService.createChild(label, data, parentPath, relationship, parentTitle);
         if (result) {
             return ResponseEntity.ok("Data synced successfully");
         } else {
