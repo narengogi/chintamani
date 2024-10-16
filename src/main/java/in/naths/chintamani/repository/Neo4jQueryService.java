@@ -39,11 +39,18 @@ public class Neo4jQueryService {
         }
     }
     
-    public String getChildren(String id) {
+    public String getChildren(String id, int page) {
         Collection<Map<String, Object>> result = neo4jClient.query(
             "MATCH (parent {id: $id})-[r]->(child) " +
+            "WITH child, elementId(child) AS elementId " +
+            "ORDER BY elementId " +
+            "SKIP $start " +
+            "LIMIT 15 " +
             "RETURN child{.*, id: child.id, parentId: $id, labels: labels(child)} AS node"
-        ).bind(id).to("id").fetch().all();
+        )
+        .bind(id).to("id")
+        .bind(page * 15).to("start")
+        .fetch().all();
         try {
             return objectMapper.writeValueAsString(result);
         } catch (Exception e) {
