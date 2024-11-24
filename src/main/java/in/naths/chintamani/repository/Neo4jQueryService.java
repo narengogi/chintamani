@@ -38,7 +38,20 @@ public class Neo4jQueryService {
             return null;
         }
     }
-    
+
+    public String getNodeByTitle(String title) {
+        Map<String, Object> result = neo4jClient.query("MATCH (n) WHERE n.title = $title RETURN n{.*, id: n.id, parentId: null, labels: labels(n)} AS node")
+            .bind(title).to("title")
+            .fetch()
+            .one()
+            .orElse(null);
+        try {
+            return objectMapper.writeValueAsString(result);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public String getChildren(String id, int page) {
         Collection<Map<String, Object>> result = neo4jClient.query(
             "MATCH (parent {id: $id})-[r]->(child) " +

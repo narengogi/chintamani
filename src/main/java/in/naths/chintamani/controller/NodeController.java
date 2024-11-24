@@ -18,6 +18,12 @@ public class NodeController {
         System.out.println("Getting node");
         return neo4jQueryService.getNodeNarenAsJson();
     }
+    
+    @GetMapping("/node/{title}")
+    public String getNode(@PathVariable String title) {
+        System.out.println("Getting node with title " + title);
+        return neo4jQueryService.getNodeByTitle(title);
+    }
 
     @GetMapping("/children/{id}")
     public String getChildren(@PathVariable String id, @RequestParam int page) {
